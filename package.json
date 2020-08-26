@@ -1,0 +1,52 @@
+{
+  "name": "whistle-editor",
+  "version": "0.0.1",
+  "description": "whistle rules editor",
+  "main": "dist/index.js",
+  "scripts": {
+    "lint": "eslint src test",
+    "lintfix": "eslint --fix src test",
+    "dev": "webpack -w --config ./src/webpack/webpack.dev.js",
+    "dist": "webpack --config ./src/webpack/webpack.prod.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/avwo/whistle-editor.git"
+  },
+  "keywords": [
+    "whistle",
+    "editor",
+    "rules"
+  ],
+  "author": "avenwu <avenwu@vip.qq.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/avwo/whistle-editor/issues"
+  },
+  "homepage": "https://github.com/avwo/whistle-editor#readme",
+  "devDependencies": {
+    "@babel/core": "^7.11.4",
+    "@babel/preset-env": "^7.11.0",
+    "@babel/preset-react": "^7.10.4",
+    "babel-eslint": "^10.1.0",
+    "babel-loader": "^8.1.0",
+    "babel-plugin-import": "^1.13.0",
+    "babel-plugin-transform-class-properties": "^6.24.1",
+    "babel-plugin-transform-object-assign": "^6.22.0",
+    "codemirror": "5.5.0",
+    "css-loader": "^4.2.2",
+    "eslint": "^7.7.0",
+    "eslint-config-imweb": "^0.2.19",
+    "file-loader": "^6.0.0",
+    "html-webpack-plugin": "^4.3.0",
+    "postcss-loader": "^3.0.0",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
+    "style-loader": "^1.2.1",
+    "terser-webpack-plugin": "^4.1.0",
+    "webpack": "^4.44.1",
+    "webpack-cli": "^3.3.12",
+    "webpack-merge": "^5.1.2",
+    "whistle": "^2.5.17"
+  }
+}
