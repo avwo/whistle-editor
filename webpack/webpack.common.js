@@ -1,5 +1,4 @@
 const path = require('path');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 const rootDir = path.join(__dirname, '../');
 
@@ -57,12 +56,4 @@ module.exports = {
     ],
   },
   devtool: 'none',
-  plugins: [
-    new HtmlWebpackPlugin({
-      filename: 'test.html',
-      title: 'Test',
-      template: path.resolve(rootDir, 'test/test.html'),
-      chunks: ['test'],
-    }),
-  ],
 };
