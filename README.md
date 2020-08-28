@@ -1,12 +1,19 @@
 # whistle-editor
 本模块是 whistle 编辑器的 React 组件，可以作为 whistle 规则及其 Values 编辑器。
 
+# 安装
+``` sh
+npm i -D whistle-editor
+```
+
+![image](https://user-images.githubusercontent.com/11450939/91602870-9b6df280-e99e-11ea-937b-9854f12359cb.png)
+
 # 用法
 ``` js
 import React from 'react';
 import ReactDOM from 'react-dom';
 import Editor from 'whistle-editor';
-console.log(Editor)
+
 const plugins = {
   'whistle.test': 'http://123',
   share: 0,
