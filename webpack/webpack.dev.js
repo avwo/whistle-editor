@@ -8,6 +8,9 @@ const commonCfg = require('./webpack.common');
 
 module.exports = merge(commonCfg, {
   mode: 'development',
+  entry: {
+    test: path.resolve(rootDir, 'test/test.js'),
+  },
   output: {
     filename: '[name].js',
     path: path.join(rootDir, 'dist'),
