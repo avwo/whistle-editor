@@ -1,8 +1,6 @@
 const CodeMirror = require('codemirror');
 const protocols = require('./protocols');
 
-const forwardRules = protocols.getForwardRules();
-const pluginRules = protocols.getPluginRules();
 const DOT_PATTERN_RE = /^\.[\w-]+(?:[?$]|$)/;
 const DOT_DOMAIN_RE = /^\.[^./?]+\.[^/?]/;
 const IPV4_PORT_RE = /^(?:::(?:ffff:)?)?(?:(?:25[0-5]|2[0-4]\d|1\d{2}|[1-9]?\d)\.){3}(?:25[0-5]|2[0-4]\d|1\d{2}|[1-9]?\d)(?:\:(\d+))?$/; // eslint-disable-line
@@ -67,12 +65,12 @@ CodeMirror.defineMode('rules', () => {
 
   function notExistRule(str) {
     str = str.substring(0, str.indexOf(':'));
-    return forwardRules.indexOf(str) === -1 && str !== 'status';
+    return protocols.getForwardRules().indexOf(str) === -1 && str !== 'status';
   }
 
   function notExistPlugin(str) {
     str = str.substring(0, str.indexOf(':'));
-    return pluginRules.indexOf(str) === -1;
+    return protocols.getPluginRules().indexOf(str) === -1;
   }
 
   function isRegExp(str) {

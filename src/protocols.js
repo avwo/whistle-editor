@@ -12,20 +12,45 @@ const PROTOCOLS = ['rule', 'style', 'pipe', 'plugin', 'host', 'xhost', 'proxy', 
   'reqWriteRaw', 'resWriteRaw',
 ];
 
-
+const WHISTLE_PLUGIN_RE = /^(?:whistle\.)?([a-z\d_-]+)$/;
 const innerRules = ['file', 'xfile', 'tpl', 'xtpl', 'rawfile', 'xrawfile', 'statusCode'];
-const pluginRules = [];
-const forwardRules = innerRules.slice();
+let plugins = {};
+let pluginRules = [];
+let forwardRules = innerRules.slice();
 const webProtocols = ['http', 'https', 'ws', 'wss', 'tunnel'];
 let allInnerRules = webProtocols.concat(innerRules).concat(PROTOCOLS.slice(1));
 allInnerRules.splice(allInnerRules.indexOf('plugin'), 1);
 allInnerRules.splice(allInnerRules.indexOf('reqScript') + 1, 0, 'reqRules');
 allInnerRules.splice(allInnerRules.indexOf('resScript') + 1, 0, 'resRules');
 allInnerRules = allInnerRules.map(name => `${name}://`);
-const allRules = allInnerRules;
+let allRules = allInnerRules;
 allRules.splice(allRules.indexOf('filter://'), 1, 'excludeFilter://', 'includeFilter://');
 
 exports.PROTOCOLS = PROTOCOLS;
+
+exports.setPlugins = (allPlugins) => {
+  plugins = {};
+  if (!allPlugins) {
+    return;
+  }
+  pluginRules = [];
+  forwardRules = innerRules.slice();
+  allRules = allInnerRules.slice();
+  Object.keys(allPlugins).forEach((name) => {
+    if (!WHISTLE_PLUGIN_RE.test(name)) {
+      return;
+    }
+    const shortName = RegExp.$1;
+    const helpUrl = allPlugins[name];
+    if (helpUrl && typeof helpUrl === 'string') {
+      plugins[shortName] = helpUrl;
+    }
+    forwardRules.push(shortName);
+    allRules.push(`${shortName}://`);
+    pluginRules.push(`whistle.${shortName}`);
+    allRules.push(`whistle.${shortName}://`);
+  });
+};
 
 exports.getForwardRules = function () {
   return forwardRules;
@@ -62,5 +87,5 @@ exports.getHelpUrl = function (rule) {
   if (PROTOCOLS.indexOf(rule) !== -1) {
     return `${ROOT_HELP_URL + rule.replace(/^x/, '')}.html`;
   }
-  return ROOT_HELP_URL;
+  return plugins[rule] || plugins[rule.substring(rule.indexOf('.') + 1)] || ROOT_HELP_URL;
 };

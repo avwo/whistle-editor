@@ -2,4 +2,9 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import Editor from './index';
 
-ReactDOM.render(<Editor mode="rules" />, document.getElementById('root'));
+const plugins = {
+  'whistle.test': 'http://123',
+  share: 0,
+};
+
+ReactDOM.render(<Editor mode="rules" plugins={plugins} />, document.getElementById('root'));

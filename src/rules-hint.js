@@ -96,7 +96,7 @@ function getAtValueList(keyword) {
 
 function getAtHelpUrl(name, options) {
   try {
-    const _getAtHelpUrl = window.parent.getAtHelpUrlForWhistle;
+    const _getAtHelpUrl = window.getAtHelpUrlForWhistle;
     if (typeof _getAtHelpUrl !== 'function') {
       return;
     }

@@ -24,6 +24,7 @@ const React = require('react');
 const ReactDOM = require('react-dom');
 const CodeMirror = require('codemirror');
 const rulesHint = require('./rules-hint');
+const protocols = require('./protocols');
 
 const INIT_LENGTH = 1024 * 16;
 
@@ -101,7 +102,7 @@ class Editor extends React.Component {
           return true;
         }
         try {
-          const onKeyDown = window.parent.onWhistleRulesEditorKeyDown;
+          const onKeyDown = window.onWhistleRulesEditorKeyDown;
           if (typeof onKeyDown === 'function' && onKeyDown(e, options) === false) {
             e.stopPropagation();
             e.preventDefault();
@@ -321,6 +322,10 @@ class Editor extends React.Component {
     self.showLineWrapping(self.props.lineWrapping || false);
     self.setReadOnly(self.props.readOnly || false);
     self.setAutoComplete();
+    if (self._curPlugins !== self.props.plugins) {
+      self._curPlugins = self.props.plugins;
+      protocols.setPlugins(self._curPlugins);
+    }
   }
 
   isRulesEditor() {
