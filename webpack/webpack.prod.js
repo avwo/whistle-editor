@@ -5,6 +5,9 @@ const common = require('./webpack.common.js');
 
 module.exports = merge(common, {
   mode: 'production',
+  output: {
+    libraryTarget: 'umd',
+  },
   optimization: {
     minimizer: [
       new TerserPlugin({
