@@ -52,5 +52,3 @@ ReactDOM.render(editor, document.getElementById('root'));
 6. `theme`: 编辑器主题，默认为 `cobalt`，可选：['default', 'neat', 'elegant', 'erlang-dark', 'night', 'monokai', 'cobalt', 'eclipse', 'rubyblue', 'lesser-dark', 'xq-dark', 'xq-light', 'ambiance', 'blackboard', 'vibrant-ink', 'solarized dark', 'solarized light', 'twilight', 'midnight']
 7. fontSize: 字体大小，默认 `14px`
 8. lineNumbers: `true` | `false`，是否显示行数，默认为 `false`
-
-  },
