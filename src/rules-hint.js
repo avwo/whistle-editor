@@ -1,6 +1,5 @@
 require('codemirror/addon/hint/show-hint.css');
 require('codemirror/addon/hint/show-hint.js');
-const $ = require('jquery');
 const CodeMirror = require('codemirror');
 const protocols = require('./protocols');
 
@@ -205,10 +204,9 @@ CHARS.forEach((ch) => {
 });
 
 function getFocusRuleName(editor) {
-  let name;
-  const activeHint = $('li.CodeMirror-hint-active');
-  if (activeHint.is(':visible')) {
-    name = activeHint.text();
+  const activeHint = document.querySelector('li.CodeMirror-hint-active');
+  let name = activeHint && activeHint.innerText;
+  if (name) {
     if (showAtHint) {
       name = `@${name}`;
     } else {

@@ -62,8 +62,5 @@ exports.getHelpUrl = function (rule) {
   if (PROTOCOLS.indexOf(rule) !== -1) {
     return `${ROOT_HELP_URL + rule.replace(/^x/, '')}.html`;
   }
-  if (pluginRules.indexOf(rule) !== -1) {
-    rule = rule.substring(rule.indexOf('.') + 1);
-  }
   return ROOT_HELP_URL;
 };

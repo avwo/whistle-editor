@@ -20,7 +20,6 @@ require('codemirror/addon/dialog/dialog.css');
 require('codemirror/addon/search/matchesonscrollbar.css');
 require('./index.css');
 
-const $ = require('jquery');
 const React = require('react');
 const ReactDOM = require('react-dom');
 const CodeMirror = require('codemirror');
@@ -49,10 +48,7 @@ const DEFAULT_FONT_SIZE = '16px';
 const RULES_COMMENT_RE = /^()\s*#\s*/;
 const JS_COMMENT_RE = /^(\s*)\/\/+\s?/;
 const NO_SPACE_RE = /\S/;
-
-function hasSelector(selector) {
-  return document.querySelector ? document.querySelector(selector) : $(selector).length;
-}
+const LINK_RE = /\bcm-js-(?:type|at|http-url)\b/;
 
 class Editor extends React.Component {
   componentDidMount() {
@@ -67,16 +63,11 @@ class Editor extends React.Component {
       }
     });
     editor.on('mousedown', (_, e) => {
-      if (!(e.ctrlKey || e.metaKey)) {
-        return;
-      }
-      const target = $(e.target);
-      if (target.hasClass('cm-js-type') || target.hasClass('cm-js-at') || target.hasClass('cm-js-http-url')) {
+      if ((e.ctrlKey || e.metaKey) && LINK_RE.test(e.target.className)) {
         e.preventDefault();
       }
     });
     self._init(true);
-    $(elem).find('.CodeMirror').addClass('fill');
     const resize = function() {
       const height = elem.offsetHeight || 0;
       if (height < 10) {
@@ -87,12 +78,12 @@ class Editor extends React.Component {
       }
     };
     resize();
-    $(window).on('resize', () => {
+    window.addEventListener('resize', () => {
       clearTimeout(timeout);
       timeout = null;
       timeout = setTimeout(resize, 30);
     });
-    $(elem).on('keydown', (e) => {
+    elem.addEventListener('keydown', (e) => {
       const isRules = self.isRulesEditor();
       const isJS = self._mode === 'javascript';
       if (isRules) {
@@ -276,7 +267,7 @@ class Editor extends React.Component {
         const _byDelete = e.keyCode === 8;
         if (_byDelete || e.keyCode === 13) {
           timer = setTimeout(() => {
-            if (!hasSelector('.CodeMirror-hints')) {
+            if (!document.querySelector('.CodeMirror-hints')) {
               editor._byDelete = true;
               editor._byEnter = !_byDelete;
               editor.execCommand('autocomplete');
@@ -344,4 +335,3 @@ class Editor extends React.Component {
 }
 
 module.exports = Editor;
-
