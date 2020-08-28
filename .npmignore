@@ -40,10 +40,9 @@ jspm_packages
 test
 
 # source
-/src
 /docs
 /deploy.sh
 /.*
-/dist/test.html
-/dist/test.js
 /test
+/webpack
+/dist

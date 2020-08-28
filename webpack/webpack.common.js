@@ -1,13 +1,12 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
-const rootDir = path.join(__dirname, '../../');
-const srcDir = path.resolve(rootDir, 'src');
+const rootDir = path.join(__dirname, '../');
 
 module.exports = {
   entry: {
-    index: path.resolve(srcDir, 'index.js'),
-    test: path.resolve(srcDir, 'test.js'),
+    index: path.resolve(rootDir, 'src/index.js'),
+    test: path.resolve(rootDir, 'test/test.js'),
   },
   output: {
     filename: '[name].js',
@@ -63,7 +62,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       filename: 'test.html',
       title: 'Test',
-      template: path.resolve(srcDir, 'index.html'),
+      template: path.resolve(rootDir, 'test/test.html'),
       chunks: ['test'],
     }),
   ],

@@ -6,12 +6,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import Editor from 'whistle-editor';
-
-const plugins = {
-  'whistle.test': 'http://123',
-  share: 0,
-};
-
+console.log(Editor)
 const plugins = {
   'whistle.test': 'http://123',
   share: 0,
