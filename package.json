@@ -6,7 +6,8 @@
   "scripts": {
     "lint": "eslint src test",
     "lintfix": "eslint --fix src test",
-    "dev": "webpack -w --config ./webpack/webpack.dev.js"
+    "dev": "webpack -w --config ./webpack/webpack.dev.js",
+    "dist": "webpack --config ./webpack/webpack.prod.js"
   },
   "repository": {
     "type": "git",
