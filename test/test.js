@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import Editor from '../src/index';
+import Editor from 'whistle-editor';
 
 const plugins = {
   'whistle.test': 'http://123',
