@@ -7,4 +7,21 @@ const plugins = {
   share: 0,
 };
 
-ReactDOM.render(<Editor mode="rules" plugins={plugins} />, document.getElementById('root'));
+const onChange = (e) => {
+  console.log(e.getValue());
+};
+
+const editor = (
+  <Editor
+    value="test"
+    fontSize="16px"
+    theme="monokai"
+    lineNumbers
+    onChange={onChange}
+    className="test-class"
+    mode="rules"
+    plugins={plugins}
+  />
+);
+
+ReactDOM.render(editor, document.getElementById('root'));
