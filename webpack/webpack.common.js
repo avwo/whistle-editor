@@ -6,6 +6,7 @@ const rootDir = path.join(__dirname, '../');
 module.exports = {
   entry: {
     index: path.resolve(rootDir, 'src/index.js'),
+    test: path.resolve(rootDir, 'test/test.js'),
   },
   output: {
     filename: '[name].js',
