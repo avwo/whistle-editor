@@ -16,7 +16,6 @@ module.exports = merge(commonCfg, {
     filename: '[name].js',
     path: path.join(rootDir, 'dist'),
   },
-  devtool: 'cheap-module-eval-source-map',
   plugins: [
     new HtmlWebpackPlugin({
       filename: 'test.html',
