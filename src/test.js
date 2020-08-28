@@ -1,6 +1,5 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import Editor from './index';
 
-const Editor = require('./editor');
-
-ReactDOM.render(<Editor />, document.getElementById('root'));
+ReactDOM.render(<Editor mode="rules" />, document.getElementById('root'));
