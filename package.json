@@ -1,8 +1,7 @@
 {
   "name": "whistle-editor",
-  "version": "0.0.3",
+  "version": "0.1.0",
   "description": "whistle rules editor",
-  "main": "src/index.js",
   "scripts": {
     "lint": "eslint src test",
     "lintfix": "eslint --fix src test",
@@ -46,7 +45,6 @@
     "terser-webpack-plugin": "^4.1.0",
     "webpack": "^4.44.1",
     "webpack-cli": "^3.3.12",
-    "webpack-merge": "^5.1.2",
-    "whistle": "^2.5.17"
+    "webpack-merge": "^5.1.2"
   }
 }
