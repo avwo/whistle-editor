@@ -32,6 +32,7 @@ export interface WhistleEditorProps {
     | "midnight";
   fontSize?: string;
   lineNumbers?: boolean;
+  onSave?: () => void;
 }
 
 declare const Editor: React.ComponentClass<WhistleEditorProps>;

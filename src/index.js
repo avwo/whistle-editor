@@ -101,6 +101,12 @@ class Editor extends React.Component {
           e.preventDefault();
           return true;
         }
+        if ((e.ctrlKey || e.metaKey) && e.keyCode === 83) {
+          e.preventDefault();
+          e.stopPropagation();
+          const save = self.props.onSave || (() => {});
+          save.call(self);
+        }
         try {
           const onKeyDown = window.onWhistleRulesEditorKeyDown;
           if (typeof onKeyDown === 'function' && onKeyDown(e, options) === false) {
