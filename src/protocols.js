@@ -12,7 +12,7 @@ const PROTOCOLS = ['rule', 'style', 'pipe', 'plugin', 'host', 'xhost', 'proxy', 
   'reqWriteRaw', 'resWriteRaw',
 ];
 
-const WHISTLE_PLUGIN_RE = /^(?:whistle\.)?([a-z\d_-]+)$/;
+const WHISTLE_PLUGIN_RE = /^(whistle\.)?(?:[a-z\d_-]+)$/;
 const innerRules = ['file', 'xfile', 'tpl', 'xtpl', 'rawfile', 'xrawfile', 'statusCode'];
 let plugins = {};
 let pluginRules = [];
@@ -40,15 +40,18 @@ exports.setPlugins = (allPlugins) => {
     if (!WHISTLE_PLUGIN_RE.test(name)) {
       return;
     }
-    const shortName = RegExp.$1;
+    const prefix = RegExp.$1;
     const helpUrl = allPlugins[name];
     if (helpUrl && typeof helpUrl === 'string') {
-      plugins[shortName] = helpUrl;
+      plugins[name] = helpUrl;
     }
-    forwardRules.push(shortName);
-    allRules.push(`${shortName}://`);
-    pluginRules.push(`whistle.${shortName}`);
-    allRules.push(`whistle.${shortName}://`);
+    if (prefix) {
+      pluginRules.push(name);
+      allRules.push(`${name}://`);
+    } else {
+      forwardRules.push(name);
+      allRules.push(`${name}://`);
+    }
   });
 };
 

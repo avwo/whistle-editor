@@ -3,8 +3,9 @@ import ReactDOM from 'react-dom';
 import Editor from '../src/index';
 
 const plugins = {
-  'whistle.test': 'http://123',
+  'whistle.test': 'http://123.com',
   share: 0,
+  test: 'http://abc.com'
 };
 
 const onChange = (e) => {
