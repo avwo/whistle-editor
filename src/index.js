@@ -144,8 +144,8 @@ class Editor extends React.Component {
           }
           lines.push(line);
         }
-        isEmpty = !hasComment;
-        if (isEmpty && !hasRule) {
+        isEmpty = !hasComment && !hasRule;
+        if (isEmpty) {
           return;
         }
         let lastIndex; let firstLine; let

@@ -5,11 +5,11 @@ import Editor from '../src/index';
 const plugins = {
   'whistle.test': 'http://123.com',
   share: 0,
-  test: 'http://abc.com'
+  test: 'http://abc.com',
 };
 
 const onChange = (e) => {
-  console.log(e.getValue());
+  console.log(e.getValue()); // eslint-disable-line
 };
 
 const editor = (
