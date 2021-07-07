@@ -9,22 +9,28 @@ const PROTOCOLS = ['rule', 'style', 'pipe', 'plugin', 'host', 'xhost', 'proxy', 
   'reqBody', 'resBody', 'reqAppend', 'resAppend', 'headerReplace', 'reqReplace', 'resReplace',
   'htmlPrepend', 'htmlBody', 'htmlAppend', 'cssPrepend', 'cssBody',
   'cssAppend', 'jsPrepend', 'jsBody', 'jsAppend', 'reqWrite', 'resWrite',
-  'reqWriteRaw', 'resWriteRaw',
+  'reqWriteRaw', 'resWriteRaw', 'cipher',
 ];
 
-const WHISTLE_PLUGIN_RE = /^(whistle\.)?(?:[a-z\d_-]+)$/;
+
 const innerRules = ['file', 'xfile', 'tpl', 'xtpl', 'rawfile', 'xrawfile', 'statusCode'];
-let plugins = {};
 let pluginRules = [];
+// const pluginNameList = [];
+// const allPluginNameList = [];
 let forwardRules = innerRules.slice();
 const webProtocols = ['http', 'https', 'ws', 'wss', 'tunnel'];
 let allInnerRules = webProtocols.concat(innerRules).concat(PROTOCOLS.slice(1));
 allInnerRules.splice(allInnerRules.indexOf('plugin'), 1);
 allInnerRules.splice(allInnerRules.indexOf('reqScript') + 1, 0, 'reqRules');
 allInnerRules.splice(allInnerRules.indexOf('resScript') + 1, 0, 'resRules');
-allInnerRules = allInnerRules.map(name => `${name}://`);
+allInnerRules = allInnerRules.map((name) => {
+  return `${name}://`;
+});
+allInnerRules.splice(allInnerRules.indexOf('filter://'), 1, 'excludeFilter://', 'includeFilter://');
+allInnerRules.push('lineProps://');
 let allRules = allInnerRules;
-allRules.splice(allRules.indexOf('filter://'), 1, 'excludeFilter://', 'includeFilter://');
+const WHISTLE_PLUGIN_RE = /^(whistle\.)?(?:([a-z\d_-]+))$/;
+let plugins = {};
 
 exports.PROTOCOLS = PROTOCOLS;
 

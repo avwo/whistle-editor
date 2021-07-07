@@ -1,5 +1,5 @@
 require('codemirror/addon/hint/show-hint.css');
-require('codemirror/addon/hint/show-hint.js');
+require('codemirror/addon/hint/show-hint');
 const CodeMirror = require('codemirror');
 const protocols = require('./protocols');
 
