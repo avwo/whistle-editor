@@ -1,12 +1,16 @@
 const CodeMirror = require('codemirror');
 const protocols = require('./protocols');
 
+const forwardRules = protocols.getForwardRules();
+const pluginRules = protocols.getPluginRules();
+const pluginNameList = protocols.getPluginNameList();
 const DOT_PATTERN_RE = /^\.[\w-]+(?:[?$]|$)/;
 const DOT_DOMAIN_RE = /^\.[^./?]+\.[^/?]/;
-const IPV4_PORT_RE = /^(?:::(?:ffff:)?)?(?:(?:25[0-5]|2[0-4]\d|1\d{2}|[1-9]?\d)\.){3}(?:25[0-5]|2[0-4]\d|1\d{2}|[1-9]?\d)(?:\:(\d+))?$/; // eslint-disable-line
+const IPV4_PORT_RE = /^(?:::(?:ffff:)?)?(?:(?:25[0-5]|2[0-4]\d|1\d{2}|[1-9]?\d)\.){3}(?:25[0-5]|2[0-4]\d|1\d{2}|[1-9]?\d)(?::(\d+))?$/; // eslint-disable-line
 const FULL_IPV6_RE = /^[\da-f]{1,4}(?::[\da-f]{1,4}){7}$/;
 const SHORT_IPV6_RE = /^[\da-f]{1,4}(?::[\da-f]{1,4}){0,6}$/;
 const IP_WITH_PORT_RE = /^\[([:\da-f.]+)\](?::(\d+))?$/i;
+const PLUGIN_VAR_RE = /^%([a-z\d_-]+)=/;
 
 function notPort(port) {
   return port && (port == 0 || port > 65535); // eslint-disable-line
@@ -65,12 +69,12 @@ CodeMirror.defineMode('rules', () => {
 
   function notExistRule(str) {
     str = str.substring(0, str.indexOf(':'));
-    return protocols.getForwardRules().indexOf(str) === -1 && str !== 'status';
+    return forwardRules.indexOf(str) === -1 && str !== 'status';
   }
 
   function notExistPlugin(str) {
     str = str.substring(0, str.indexOf(':'));
-    return protocols.getPluginRules().indexOf(str) === -1;
+    return pluginRules.indexOf(str) === -1;
   }
 
   function isRegExp(str) {
@@ -93,6 +97,10 @@ CodeMirror.defineMode('rules', () => {
     return /^(?:excludeFilter|filter):\/\//.test(str);
   }
 
+  function isLineProps(str) {
+    return /^lineProps:\/\//.test(str);
+  }
+
   function isPlugin(str) {
     return /^pipe:\/\//.test(str) || (/^(?:plugin|whistle)\.[a-z\d_-]+:\/\//.test(str) && !notExistPlugin(str));
   }
@@ -103,6 +111,10 @@ CodeMirror.defineMode('rules', () => {
 
   function isDisable(str) {
     return /^disable:\/\//.test(str);
+  }
+
+  function isCipher(str) {
+    return /^cipher:\/\//.test(str);
   }
 
   function isIgnore(str) {
@@ -149,6 +161,10 @@ CodeMirror.defineMode('rules', () => {
     return domain.indexOf('*') !== -1 || domain.indexOf('~') !== -1 || DOT_DOMAIN_RE.test(domain);
   }
 
+  function isPluginVar(str) {
+    return PLUGIN_VAR_RE.test(str) && RegExp.$1;
+  }
+
   function isRegUrl(url) {
     return /^\^/.test(url) || DOT_PATTERN_RE.test(url);
   }
@@ -159,14 +175,16 @@ CodeMirror.defineMode('rules', () => {
         return null;
       }
 
-      const curCh = stream.next();
-      if (curCh === '#') {
-        stream.eatWhile(() => true);
+      const firstCh = stream.next();
+      if (firstCh === '#') {
+        stream.eatWhile(() => {
+          return true;
+        });
         return 'comment';
       }
 
-      const not = curCh === '!';
-      let str = not ? stream.next() : curCh;
+      const not = firstCh === '!';
+      let str = not ? stream.next() : firstCh;
       let type = '';
       let pre; let
         isHttpUrl;
@@ -204,12 +222,16 @@ CodeMirror.defineMode('rules', () => {
             type = 'variable-2 js-headerReplace js-type';
           } else if (isFilter(str)) {
             type = 'negative js-filter js-type';
+          } else if (isLineProps(str)) {
+            type = 'negative js-line-props js-type';
           } else if (isIgnore(str)) {
             type = 'negative js-ignore js-type';
           } else if (isEnable(str)) {
             type = 'atom js-enable js-type';
           } else if (isDisable(str)) {
             type = 'negative js-disable js-type';
+          } else if (isCipher(str)) {
+            type = 'atom js-cipher js-type';
           } else if (isDelete(str)) {
             type = 'negative js-delete js-type';
           } else if (isProxy(str)) {
@@ -236,8 +258,14 @@ CodeMirror.defineMode('rules', () => {
         if (isRegExp(str) || isRegUrl(str) || isPortPattern(str)) {
           return 'attribute js-attribute';
         }
+        let pluginName;
         if (/^@/.test(str)) {
           type = 'atom js-at js-type';
+        } else if (pluginName = isPluginVar(str)) { // eslint-disable-line
+          type = 'variable-2 js-plugin-var js-type';
+          if (pluginNameList.indexOf(pluginName) === -1 || stream.column() !== stream.indentation()) {
+            type += ' error-rule';
+          }
         } else if (isWildcard(str)) {
           type = 'attribute js-attribute';
         } else if (isIP(str)) {

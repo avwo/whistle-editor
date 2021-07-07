@@ -15,8 +15,8 @@ const PROTOCOLS = ['rule', 'style', 'pipe', 'plugin', 'host', 'xhost', 'proxy', 
 
 const innerRules = ['file', 'xfile', 'tpl', 'xtpl', 'rawfile', 'xrawfile', 'statusCode'];
 let pluginRules = [];
-// const pluginNameList = [];
-// const allPluginNameList = [];
+const pluginNameList = [];
+const allPluginNameList = [];
 let forwardRules = innerRules.slice();
 const webProtocols = ['http', 'https', 'ws', 'wss', 'tunnel'];
 let allInnerRules = webProtocols.concat(innerRules).concat(PROTOCOLS.slice(1));
@@ -67,6 +67,14 @@ exports.getForwardRules = function () {
 
 exports.getPluginRules = function () {
   return pluginRules;
+};
+
+exports.getPluginNameList = function() {
+  return pluginNameList;
+};
+
+exports.getAllPluginNameList = function() {
+  return allPluginNameList;
 };
 
 exports.getAllRules = function () {
