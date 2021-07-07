@@ -59,3 +59,25 @@ ReactDOM.render(editor, document.getElementById('root'));
 6. `theme`: 编辑器主题，默认为 `cobalt`，可选：['default', 'neat', 'elegant', 'erlang-dark', 'night', 'monokai', 'cobalt', 'eclipse', 'rubyblue', 'lesser-dark', 'xq-dark', 'xq-light', 'ambiance', 'blackboard', 'vibrant-ink', 'solarized dark', 'solarized light', 'twilight', 'midnight']
 7. fontSize: 字体大小，默认 `14px`
 8. lineNumbers: `true` | `false`，是否显示行数，默认为 `false`
+
+
+# 开发
+执行命令构建：
+
+``` sh
+npm run dev
+```
+
+构建完成，用 Chrome 浏览器打开 `dist/test.html` 即可看到效果，修改代码后手动重新刷新页面即可。
+
+
+# 发布
+执行命令构建：
+``` sh
+npm run dist
+```
+构建完成，执行发布命令：
+``` sh
+npm publish
+```
+
