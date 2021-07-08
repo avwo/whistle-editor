@@ -46,6 +46,11 @@ ReactDOM.render(editor, document.getElementById('root'));
     ``` txt
     const plugins = {
       test: 'http://xxxx',
+      test2: {
+        homepage: 'http://xxxx',
+        hintList: ['1', '2', '3'] ｜ function,
+        pluginVars: true | { hintList: ['1', '2', '3'] ｜ function}
+      },
       ...
     };
     ```
