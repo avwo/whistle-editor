@@ -1,20 +1,40 @@
 import React from "react";
 
-export interface EditorOnchangeEvent {
-  getValue: (value?: string) => string;
+export interface EditorChangeEvent {
+  getValue: () => string;
 }
+
+export interface HintOptions {
+  protocol: string;
+  value: string;
+}
+
+export interface HintCallback {
+  (list: Array<string>): void
+}
+
+export interface GetHintList {
+  (options: HintOptions, callback: HintCallback): void;
+}
+
+export type HintList = Array<string>;
 
 export interface PluginConfig {
   homepage?: string;
-
+  hintList?: HintList | GetHintList;
+  pluginVars?: true | {
+    hintList: HintList | GetHintList;
+  }
 }
 
 export interface WhistleEditorProps {
   className?: string;
   mode?: "rules" | "html" | "js" | "pac" | "jsx" | "json" | "css" | "md";
-  plugins?: { [name: string]: string };
+  plugins?: {
+    [name: string]: string | PluginConfig;
+  };
   value?: string;
-  onChange?: (e: EditorOnchangeEvent) => void;
+  onChange?: (e: EditorChangeEvent) => void;
   theme?:
     | "default"
     | "neat"
@@ -39,6 +59,6 @@ export interface WhistleEditorProps {
   lineNumbers?: boolean;
 }
 
-declare const Editor: React.ComponentClass<WhistleEditorProps>;
+type WhistleEditor = React.ComponentClass<WhistleEditorProps>;
 
-export default Editor;
+export default WhistleEditor;
