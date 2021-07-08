@@ -266,7 +266,7 @@ CodeMirror.registerHelper('hint', 'rulesHint', (editor) => {
     if (plugin || PLUGIN_NAME_RE.test(curWord)) {
       plugin = plugin || protocols.getPlugin(RegExp.$2);
       const pluginConf = pluginVars || plugin;
-      if (plugin && (pluginConf.getHintList || pluginConf.hintList)) {
+      if (plugin && pluginConf.hintList) {
         if (!pluginVars) {
           value = RegExp.$3 || '';
           value = value.length === 2 ? curWord.substring(curWord.indexOf('//') + 2) : '';
@@ -278,7 +278,7 @@ CodeMirror.registerHelper('hint', 'rulesHint', (editor) => {
         }
         clearTimeout(hintTimer);
         const protoName = pluginVars ? `%${pluginName}` : RegExp.$1.slice(0, -1);
-        if (pluginConf.hintList) {
+        if (Array.isArray(pluginConf.hintList)) {
           if (value) {
             value = value.toLowerCase();
             curHintList = pluginConf.hintList.filter((item) => {
@@ -372,7 +372,7 @@ CodeMirror.registerHelper('hint', 'rulesHint', (editor) => {
           }
           const curOrder = ++order;
           curHintList = [];
-          pluginConf.getHintList({
+          pluginConf.hintList({
             protocol: protoName,
             value,
           }, (data) => {

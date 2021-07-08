@@ -5,16 +5,9 @@ import Editor from '../src/index';
 const plugins = {
   'whistle.test': {
     homepage: 'http://123.com',
-    getHintList: (options, callback) => {
-      if (options.value !== '3') {
-        return;
-      }
-      setTimeout(() => {
-        callback([1, 2, 3, 4, 5, 6, 7, 8, 9, 0].map(String));
-      }, 1000);
-    },
+    hintList: [1, 2, 3, 4, 5, 6, 7, 8, 9, 0].map(String),
     pluginVars: {
-      getHintList: (options, callback) => {
+      hintList: (options, callback) => {
         if (options.value !== '3') {
           return;
         }

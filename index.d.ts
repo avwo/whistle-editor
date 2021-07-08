@@ -1,7 +1,12 @@
 import React from "react";
 
 export interface EditorOnchangeEvent {
-  getValue: (seperator?: string) => string;
+  getValue: (value?: string) => string;
+}
+
+export interface PluginConfig {
+  homepage?: string;
+
 }
 
 export interface WhistleEditorProps {
