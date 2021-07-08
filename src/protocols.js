@@ -57,11 +57,11 @@ exports.setPlugins = (allPlugins) => {
     } else {
       homepage = undefined;
     }
+    plugins[name] = plugins[name] || {};
+    plugins[name].homepage = homepage;
     if (allPluginNameList.indexOf(name) === -1) {
       allPluginNameList.push(name);
       if (plugin.hintUrl || plugin.hintList) {
-        plugins[name] = plugins[name] || {};
-        plugins[name].homepage = homepage;
         plugins[name].hintUrl = plugin.hintUrl;
         plugins[name].hintList = plugin.hintList;
       }
@@ -69,8 +69,6 @@ exports.setPlugins = (allPlugins) => {
     const { pluginVars } = plugin;
     if (pluginVars && pluginNameList.indexOf(name) === -1) {
       pluginNameList.push(name);
-      plugins[name] = plugins[name] || {};
-      plugins[name].homepage = homepage;
       plugins[name].pluginVars = pluginVars;
     }
     if (prefix) {

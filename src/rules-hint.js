@@ -5,6 +5,8 @@ const protocols = require('./protocols');
 
 const NON_SPECAIL_RE = /[^:/]/;
 const AT_RE = /^@/;
+const P_RE = /^%/;
+const PIPE_RE = /^pipe:/;
 const PROTOCOL_RE = /^([^\s:]+):\/\//;
 const extraKeys = { 'Alt-/': 'autocomplete' };
 const CHARS = [
@@ -94,6 +96,34 @@ function getAtValueList(keyword) {
   } catch (e) {}
 }
 
+function getPluginVarHints(keyword, isPipe) {
+  let list;
+  if (isPipe) {
+    list = protocols.getAllPluginNameList();
+  } else {
+    keyword = keyword.substring(1);
+    list = protocols.getPluginNameList();
+  }
+  if (!keyword) {
+    return list.map((name) => {
+      return isPipe ? `pipe://${name}` : `${name}=`;
+    });
+  }
+  const result = [];
+  keyword = keyword.toLowerCase();
+  list.forEach((name) => {
+    if (isPipe) {
+      name = `pipe://${name}`;
+    } else {
+      name += '=';
+    }
+    if (name.indexOf(keyword) !== -1) {
+      result.push(name);
+    }
+  });
+  return result;
+}
+
 function getAtHelpUrl(name, options) {
   try {
     const _getAtHelpUrl = window.getAtHelpUrlForWhistle;
@@ -109,8 +139,10 @@ function getAtHelpUrl(name, options) {
 
 const WORD = /\S+/;
 let showAtHint;
+let showVarHint;
 CodeMirror.registerHelper('hint', 'rulesHint', (editor) => {
   showAtHint = false;
+  showVarHint = false;
   const byDelete = editor._byDelete || editor._byPlugin;
   const byEnter = editor._byEnter;
   editor._byDelete = false;
@@ -128,13 +160,39 @@ CodeMirror.registerHelper('hint', 'rulesHint', (editor) => {
     --start;
   }
   const curWord = start !== end && curLine.substring(start, end);
-  if (AT_RE.test(curWord)) {
-    list = !byEnter && getAtValueList(curWord.substring(1));
+  const isAt = AT_RE.test(curWord);
+  let plugin;
+  let pluginName;
+  let value;
+  let pluginVars;
+  const isPipe = PIPE_RE.test(curWord);
+  let isPluginVar = P_RE.test(curWord);
+  if (isPluginVar) {
+    const eqIdx = curWord.indexOf('=');
+    if (eqIdx !== -1) {
+      pluginName = curWord.substring(1, eqIdx);
+      plugin = pluginName && protocols.getPlugin(pluginName);
+      pluginVars = plugin && plugin.pluginVars;
+      if (!pluginVars) {
+        return;
+      }
+      value = curWord.substring(eqIdx + 1);
+      isPluginVar = false;
+    }
+  }
+  if (isAt || isPipe || isPluginVar) {
+    if (!byEnter || /^pipe:\/\/$/.test(curWord)) {
+      list = isAt ? getAtValueList(curWord) : getPluginVarHints(curWord, isPipe);
+    }
     if (!list || !list.length) {
       return;
     }
-    showAtHint = true;
-    return { list, from: CodeMirror.Pos(cur.line, start + 1), to: CodeMirror.Pos(cur.line, end) };
+    if (isAt) {
+      showAtHint = true;
+    } else if (isPluginVar) {
+      showVarHint = true;
+    }
+    return { list, from: CodeMirror.Pos(cur.line, isPipe ? start : start + 1), to: CodeMirror.Pos(cur.line, end) };
   }
   if (curWord) {
     if (curWord.indexOf('//') !== -1 || !NON_SPECAIL_RE.test(curWord)) {
@@ -209,6 +267,8 @@ function getFocusRuleName(editor) {
   if (name) {
     if (showAtHint) {
       name = `@${name}`;
+    } else if (showVarHint) {
+      name = `%${name}`;
     } else {
       const index = name.indexOf(':');
       if (index !== -1) {
@@ -234,7 +294,7 @@ function getFocusRuleName(editor) {
         }
       }
       curLine = curLine.slice(start, end);
-      if (AT_RE.test(curLine)) {
+      if (AT_RE.test(curLine) || P_RE.test(curLine)) {
         name = curLine;
       } else if (PROTOCOL_RE.test(curLine)) {
         name = RegExp.$1;
@@ -249,7 +309,14 @@ exports.getExtraKeys = function() {
 };
 
 exports.getHelpUrl = function(editor, options) {
-  const name = getFocusRuleName(editor);
+  let name = getFocusRuleName(editor);
+  const isVar = P_RE.test(name);
+  if (isVar || PIPE_RE.test(name)) {
+    name = isVar ? name.substring(1, name.indexOf('=')) : name.substring(7);
+    let plugin = name && protocols.getPlugin(name);
+    plugin = plugin && plugin.homepage;
+    return plugin || `https://avwo.github.io/whistle/plugins.html?plugin=${name}`;
+  }
   let url;
   if (AT_RE.test(name)) {
     url = getAtHelpUrl(name.substring(1), options);

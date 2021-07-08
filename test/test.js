@@ -3,7 +3,10 @@ import ReactDOM from 'react-dom';
 import Editor from '../src/index';
 
 const plugins = {
-  'whistle.test': 'http://123.com',
+  'whistle.test': {
+    homepage: 'http://123.com',
+    pluginVars: true,
+  },
   share: 0,
   test: 'http://abc.com',
 };
