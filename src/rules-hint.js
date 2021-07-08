@@ -4,10 +4,22 @@ const CodeMirror = require('codemirror');
 const protocols = require('./protocols');
 
 const NON_SPECAIL_RE = /[^:/]/;
+const PLUGIN_NAME_RE = /^((?:whistle\.)?([a-z\d_-]+):)(\/?$|\/\/)/;
+const MAX_HINT_LEN = 512;
+const MAX_VAR_LEN = 100;
 const AT_RE = /^@/;
 const P_RE = /^%/;
 const PIPE_RE = /^pipe:/;
 const PROTOCOL_RE = /^([^\s:]+):\/\//;
+const HINT_TIMEOUT = 120;
+let curHintProto;
+let curHintValue;
+let curHintList;
+let hintTimer;
+let curHintPos;
+let curHintOffset;
+let waitingRemoteHints;
+let order = 0;
 const extraKeys = { 'Alt-/': 'autocomplete' };
 const CHARS = [
   '-', '"_"', 'Shift-2', '.', ',', 'Shift-,', 'Shift-.', 'Shift-;', '/', 'Shift-/',
@@ -137,19 +149,75 @@ function getAtHelpUrl(name, options) {
   } catch (e) {}
 }
 
+function handleRemoteHints(data, editor, protoName, value, isVar) {
+  curHintPos = null;
+  curHintOffset = 0;
+  if (!data || (!Array.isArray(data) && !Array.isArray(data.list))) {
+    curHintValue = null;
+    curHintProto = null;
+    return;
+  }
+  curHintValue = value;
+  curHintProto = protoName;
+  let len = 0;
+  if (!Array.isArray(data)) {
+    curHintPos = data.position;
+    curHintOffset = parseInt(data.offset, 10) || 0;
+    data = data.list;
+  }
+  protoName += isVar ? '=' : '://';
+  const maxLen = isVar ? MAX_VAR_LEN : MAX_HINT_LEN;
+  data.forEach((item) => {
+    if (len >= 60) {
+      return;
+    }
+    if (typeof item === 'string') {
+      item = protoName + item.trim();
+      if (item.length < maxLen) {
+        ++len;
+        curHintList.push(item);
+      }
+    } else if (item) {
+      let label; let
+        curVal;
+      if (typeof item.label === 'string') {
+        label = item.label.trim();
+      }
+      if (!label && typeof item.display === 'string') {
+        label = item.display.trim();
+      }
+      if (typeof item.value === 'string') {
+        curVal = protoName + item.value.trim();
+      }
+      if (curVal && curVal.length < maxLen) {
+        ++len;
+        curHintList.push(label && label !== curVal ? {
+          displayText: label,
+          text: curVal,
+        } : curVal);
+      }
+    }
+  });
+  if (waitingRemoteHints && len) {
+    editor._byPlugin = true;
+    editor.execCommand('autocomplete');
+  }
+}
+
 const WORD = /\S+/;
 let showAtHint;
 let showVarHint;
 CodeMirror.registerHelper('hint', 'rulesHint', (editor) => {
   showAtHint = false;
   showVarHint = false;
+  waitingRemoteHints = false;
   const byDelete = editor._byDelete || editor._byPlugin;
   const byEnter = editor._byEnter;
   editor._byDelete = false;
   editor._byPlugin = false;
   editor._byEnter = false;
   const cur = editor.getCursor();
-  const curLine = editor.getLine(cur.line);
+  let curLine = editor.getLine(cur.line);
   let end = cur.ch; let start = end; let
     list;
   const commentIndex = curLine.indexOf('#');
@@ -195,7 +263,127 @@ CodeMirror.registerHelper('hint', 'rulesHint', (editor) => {
     return { list, from: CodeMirror.Pos(cur.line, isPipe ? start : start + 1), to: CodeMirror.Pos(cur.line, end) };
   }
   if (curWord) {
-    if (curWord.indexOf('//') !== -1 || !NON_SPECAIL_RE.test(curWord)) {
+    if (plugin || PLUGIN_NAME_RE.test(curWord)) {
+      plugin = plugin || protocols.getPlugin(RegExp.$2);
+      const pluginConf = pluginVars || plugin;
+      if (plugin && (pluginConf.getHintList || pluginConf.hintList)) {
+        if (!pluginVars) {
+          value = RegExp.$3 || '';
+          value = value.length === 2 ? curWord.substring(curWord.indexOf('//') + 2) : '';
+          if (value && (value.length > MAX_HINT_LEN || byEnter)) {
+            return;
+          }
+        } else if (value && (byEnter || value.length > MAX_VAR_LEN)) {
+          return;
+        }
+        clearTimeout(hintTimer);
+        const protoName = pluginVars ? `%${pluginName}` : RegExp.$1.slice(0, -1);
+        if (pluginConf.hintList) {
+          if (value) {
+            value = value.toLowerCase();
+            curHintList = pluginConf.hintList.filter((item) => {
+              if (typeof item === 'string') {
+                return item.toLowerCase().indexOf(value) !== -1;
+              }
+              if (item.text.toLowerCase().indexOf(value) !== -1) {
+                return true;
+              }
+              return item.displayText && item.displayText.toLowerCase().indexOf(value) !== -1;
+            });
+          } else {
+            curHintList = pluginConf.hintList;
+          }
+          if (!curHintList.length) {
+            return;
+          }
+          curHintList = curHintList.map((item) => {
+            let hint;
+            let text;
+            const sep = pluginVars ? '=' : '://';
+            if (typeof item === 'string') {
+              text = protoName + sep + item;
+            } else {
+              text = protoName + sep + item.text;
+              if (item.displayText) {
+                text = item.displayText;
+                hint = {
+                  text,
+                  displayText: item.displayText,
+                };
+              }
+            }
+            return hint || text;
+          });
+          curHintPos = '';
+          curHintOffset = 0;
+          curHintProto = protoName;
+          value = curHintValue;
+        }
+        if (curHintList && curHintList.length && curHintProto === protoName && value === curHintValue) {
+          if (commentIndex !== -1) {
+            curLine = curLine.substring(0, commentIndex);
+          }
+          curLine = curLine.substring(start).split(/\s/, 1)[0];
+          end = start + curLine.trim().length;
+          let from = CodeMirror.Pos(cur.line, start);
+          let to = CodeMirror.Pos(cur.line, end);
+          let hintList = curHintList;
+          const isCursorPos = curHintPos === 'cursor';
+          if (curHintOffset || isCursorPos) {
+            hintList = hintList.map((item) => {
+              const hint = {
+                from,
+                to,
+              };
+              if (typeof item === 'string') {
+                hint.text = item;
+                hint.displayText = item;
+              } else {
+                hint.text = item.text;
+                hint.displayText = item.displayText;
+              }
+              return hint;
+            });
+            if (isCursorPos) {
+              from = cur;
+            }
+          }
+          if (curHintPos === 'tail') {
+            const temp = from;
+            from = to;
+            to = temp;
+          }
+          if (curHintOffset) {
+            start = Math.max(start, from.ch + curHintOffset);
+            if (start > end) {
+              start = end;
+            }
+            from = CodeMirror.Pos(cur.line, start);
+          }
+          return { list: hintList, from, to };
+        }
+        waitingRemoteHints = true;
+        hintTimer = setTimeout(() => {
+          if (!editor._bindedHintEvents) {
+            editor._bindedHintEvents = true;
+            editor.on('blur', () => {
+              waitingRemoteHints = false;
+            });
+          }
+          const curOrder = ++order;
+          curHintList = [];
+          pluginConf.getHintList({
+            protocol: protoName,
+            value,
+          }, (data) => {
+            if (curOrder === order) {
+              handleRemoteHints(data, editor, protoName, value, pluginVars);
+            }
+          });
+        }, HINT_TIMEOUT);
+      }
+    }
+    if (value || curWord.indexOf('//') !== -1 || !NON_SPECAIL_RE.test(curWord)) {
       return;
     }
   } else if (byDelete) {
@@ -310,9 +498,8 @@ exports.getExtraKeys = function() {
 
 exports.getHelpUrl = function(editor, options) {
   let name = getFocusRuleName(editor);
-  const isVar = P_RE.test(name);
-  if (isVar || PIPE_RE.test(name)) {
-    name = isVar ? name.substring(1, name.indexOf('=')) : name.substring(7);
+  if (P_RE.test(name)) {
+    name = name.substring(1, name.indexOf('='));
     let plugin = name && protocols.getPlugin(name);
     plugin = plugin && plugin.homepage;
     return plugin || `https://avwo.github.io/whistle/plugins.html?plugin=${name}`;

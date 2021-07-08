@@ -61,15 +61,23 @@ exports.setPlugins = (allPlugins) => {
     plugins[name].homepage = homepage;
     if (allPluginNameList.indexOf(name) === -1) {
       allPluginNameList.push(name);
-      if (plugin.hintUrl || plugin.hintList) {
-        plugins[name].hintUrl = plugin.hintUrl;
+      if (typeof plugin.getHintList === 'function') {
+        plugins[name].getHintList = plugin.getHintList;
+      }
+      if (Array.isArray(plugin.hintList)) {
         plugins[name].hintList = plugin.hintList;
       }
     }
     const { pluginVars } = plugin;
     if (pluginVars && pluginNameList.indexOf(name) === -1) {
       pluginNameList.push(name);
-      plugins[name].pluginVars = pluginVars;
+      plugins[name].pluginVars = {};
+      if (typeof pluginVars.getHintList === 'function') {
+        plugins[name].pluginVars.getHintList = pluginVars.getHintList;
+      }
+      if (Array.isArray(pluginVars.hintList)) {
+        plugins[name].pluginVars.hintList = pluginVars.hintList;
+      }
     }
     if (prefix) {
       pluginRules.push(key);
