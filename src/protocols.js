@@ -14,9 +14,10 @@ const PROTOCOLS = ['rule', 'style', 'pipe', 'plugin', 'host', 'xhost', 'proxy', 
 
 
 const innerRules = ['file', 'xfile', 'tpl', 'xtpl', 'rawfile', 'xrawfile', 'statusCode'];
+let plugins = {};
 let pluginRules = [];
-const pluginNameList = [];
-const allPluginNameList = [];
+let pluginNameList = [];
+let allPluginNameList = [];
 let forwardRules = innerRules.slice();
 const webProtocols = ['http', 'https', 'ws', 'wss', 'tunnel'];
 let allInnerRules = webProtocols.concat(innerRules).concat(PROTOCOLS.slice(1));
@@ -30,33 +31,54 @@ allInnerRules.splice(allInnerRules.indexOf('filter://'), 1, 'excludeFilter://', 
 allInnerRules.push('lineProps://');
 let allRules = allInnerRules;
 const WHISTLE_PLUGIN_RE = /^(whistle\.)?(?:([a-z\d_-]+))$/;
-let plugins = {};
+let pluginHelps = {};
 
 exports.PROTOCOLS = PROTOCOLS;
 
 exports.setPlugins = (allPlugins) => {
   plugins = {};
-  if (!allPlugins) {
-    return;
-  }
+  pluginHelps = {};
+  allPlugins = allPlugins || {};
   pluginRules = [];
+  pluginNameList = [];
+  allPluginNameList = [];
   forwardRules = innerRules.slice();
   allRules = allInnerRules.slice();
-  Object.keys(allPlugins).forEach((name) => {
-    if (!WHISTLE_PLUGIN_RE.test(name)) {
+  Object.keys(allPlugins).forEach((key) => {
+    if (!WHISTLE_PLUGIN_RE.test(key)) {
       return;
     }
     const prefix = RegExp.$1;
-    const helpUrl = allPlugins[name];
-    if (helpUrl && typeof helpUrl === 'string') {
-      plugins[name] = helpUrl;
+    const name = RegExp.$2;
+    const plugin = allPlugins[key] || {};
+    let homepage = plugin.homepage || plugin.help || plugin;
+    if (homepage && typeof homepage === 'string') {
+      pluginHelps[key] = homepage;
+    } else {
+      homepage = undefined;
+    }
+    if (allPluginNameList.indexOf(name) === -1) {
+      allPluginNameList.push(name);
+      if (plugin.hintUrl || plugin.hintList) {
+        plugins[name] = plugins[name] || {};
+        plugins[name].homepage = homepage;
+        plugins[name].hintUrl = plugin.hintUrl;
+        plugins[name].hintList = plugin.hintList;
+      }
+    }
+    const { pluginVars } = plugin;
+    if (pluginVars && pluginNameList.indexOf(name) === -1) {
+      pluginNameList.push(name);
+      plugins[name] = plugins[name] || {};
+      plugins[name].homepage = homepage;
+      plugins[name].pluginVars = pluginVars;
     }
     if (prefix) {
-      pluginRules.push(name);
-      allRules.push(`${name}://`);
+      pluginRules.push(key);
+      allRules.push(`${key}://`);
     } else {
-      forwardRules.push(name);
-      allRules.push(`${name}://`);
+      forwardRules.push(key);
+      allRules.push(`${key}://`);
     }
   });
 };
@@ -81,6 +103,12 @@ exports.getAllRules = function () {
   return allRules;
 };
 
+function getPlugin(rule) {
+  return plugins[rule.substring(rule.indexOf('.') + 1)];
+}
+
+exports.getPlugin = getPlugin;
+
 const ROOT_HELP_URL = 'https://avwo.github.io/whistle/rules/';
 exports.getHelpUrl = function (rule) {
   if (!rule || rule === 'rule') {
@@ -104,5 +132,5 @@ exports.getHelpUrl = function (rule) {
   if (PROTOCOLS.indexOf(rule) !== -1) {
     return `${ROOT_HELP_URL + rule.replace(/^x/, '')}.html`;
   }
-  return plugins[rule] || plugins[rule.substring(rule.indexOf('.') + 1)] || ROOT_HELP_URL;
+  return pluginHelps[rule] || pluginHelps[rule.substring(rule.indexOf('.') + 1)] || ROOT_HELP_URL;
 };
