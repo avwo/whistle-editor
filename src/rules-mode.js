@@ -183,8 +183,8 @@ CodeMirror.defineMode('rules', () => {
       const not = firstCh === '!';
       let str = not ? stream.next() : firstCh;
       let type = '';
-      let pre; let
-        isHttpUrl;
+      let pre;
+      let isHttpUrl;
       stream.eatWhile((ch) => {
         if (/\s/.test(ch) || ch === '#') {
           return false;

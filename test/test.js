@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import Editor from '../src/index';
 
@@ -21,21 +21,30 @@ const plugins = {
   test: 'http://abc.com',
 };
 
-const onChange = (e) => {
-  console.log(e.getValue()); // eslint-disable-line
-};
 
-const editor = (
-  <Editor
-    value="test"
-    fontSize="16px"
-    theme="monokai"
-    lineNumbers
-    onChange={onChange}
-    className="test-class"
-    mode="rules"
-    plugins={plugins}
-  />
-);
+class App extends Component {
+  state = {}
+  onChange = (e) => {
+    // 获取编辑器内容
+    this.setState({ value: e.getValue() });
+  }
+  render() {
+    const { value } = this.state;
+    return (
+      <Editor
+        value={value}
+        fontSize="16px"
+        theme="monokai"
+        lineNumbers
+        onChange={this.onChange}
+        className="test-class"
+        mode="rules"
+        plugins={plugins}
+      />
+    );
+  }
+}
 
-ReactDOM.render(editor, document.getElementById('root'));
+
+
+ReactDOM.render(<App />, document.getElementById('root'));
