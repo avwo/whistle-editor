@@ -8,6 +8,10 @@ module.exports = merge(common, {
   output: {
     libraryTarget: 'umd',
   },
+  externals: {
+    react: true,
+    'react-dom': true,
+  },
   optimization: {
     minimizer: [
       new TerserPlugin({

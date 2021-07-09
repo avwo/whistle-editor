@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
-import Editor from '../src/index';
+import WhistleEditor from '../index';
 
 const plugins = {
   'whistle.test': {
@@ -31,7 +31,7 @@ class App extends Component {
   render() {
     const { value } = this.state;
     return (
-      <Editor
+      <WhistleEditor
         value={value}
         fontSize="16px"
         theme="monokai"
