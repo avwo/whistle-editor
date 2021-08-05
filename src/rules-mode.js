@@ -258,11 +258,8 @@ CodeMirror.defineMode('rules', () => {
         let pluginName;
         if (/^@/.test(str)) {
           type = 'atom js-at js-type';
-        } else if (pluginName = isPluginVar(str)) { // eslint-disable-line
+        } else if ((pluginName = isPluginVar(str)) && protocols.getPluginNameList().indexOf(pluginName) !== -1) { // eslint-disable-line
           type = 'variable-2 js-plugin-var js-type';
-          if (protocols.getPluginNameList().indexOf(pluginName) === -1) {
-            type += ' error-rule';
-          }
         } else if (isWildcard(str)) {
           type = 'attribute js-attribute';
         } else if (isIP(str)) {

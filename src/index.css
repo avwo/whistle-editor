@@ -13,9 +13,3 @@
   font-family: consolas, monospace;
   font-size: 14px;
 }
-
-.cm-error-rule {
-  text-decoration: line-through!important;
-  color: #af2018!important;
-  font-style: italic;
-}
