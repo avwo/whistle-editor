@@ -245,7 +245,7 @@ CodeMirror.defineMode('rules', () => {
           } else if (isWildcard(str)) {
             type = 'attribute js-attribute';
           } else if (isRule(str)) {
-            type = `builtin js-rule js-type${notExistRule(str) ? ' error-rule' : ''}`;
+            type = `js-rule js-type ${notExistRule(str) ? 'error-rule' : 'builtin'}`;
           }
         }
         pre = ch;
@@ -272,7 +272,7 @@ CodeMirror.defineMode('rules', () => {
       } else if (isHttpUrl && isWildcard(str)) {
         return 'attribute js-attribute';
       }
-      return not ? `${type} error-rule` : (type || 'js-http-url');
+      return not ? `error-rule` : (type || 'js-http-url');
     },
   };
 });
