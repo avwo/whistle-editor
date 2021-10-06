@@ -119,7 +119,7 @@ function getPluginVarHints(keyword, specProto) {
   }
   if (!keyword) {
     return list.map((name) => {
-      return specProto ? `pipe://${name}` : `${name}=`;
+      return specProto ? `${specProto}://${name}` : `${name}=`;
     });
   }
   const result = [];
@@ -237,7 +237,7 @@ CodeMirror.registerHelper('hint', 'rulesHint', (editor) => {
   let pluginName;
   let value;
   let pluginVars;
-  const specProto = PLUGIN_SPEC_RE.test(curWord);
+  const specProto = PLUGIN_SPEC_RE.test(curWord) && RegExp.$1;;
   let isPluginVar = P_RE.test(curWord);
   if (isPluginVar) {
     const eqIdx = curWord.indexOf('=');
