@@ -24,10 +24,12 @@ const plugins = {
 
 class App extends Component {
   state = {}
+
   onChange = (e) => {
     // 获取编辑器内容
     this.setState({ value: e.getValue() });
   }
+
   render() {
     const { value } = this.state;
     return (
@@ -44,7 +46,6 @@ class App extends Component {
     );
   }
 }
-
 
 
 ReactDOM.render(<App />, document.getElementById('root'));

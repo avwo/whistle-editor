@@ -9,7 +9,7 @@ const MAX_HINT_LEN = 512;
 const MAX_VAR_LEN = 100;
 const AT_RE = /^@/;
 const P_RE = /^%/;
-const PIPE_RE = /^pipe:/;
+const PLUGIN_SPEC_RE = /^(pipe|sniCallback):/;
 const PROTOCOL_RE = /^([^\s:]+):\/\//;
 const HINT_TIMEOUT = 120;
 let curHintProto;
@@ -108,24 +108,28 @@ function getAtValueList(keyword) {
   } catch (e) {}
 }
 
-function getPluginVarHints(keyword, isPipe) {
+function getPluginVarHints(keyword, specProto) {
   let list;
-  if (isPipe) {
+  if (specProto) {
     list = protocols.getAllPluginNameList();
+    keyword = keyword.substring(specProto.length + 3);
   } else {
     keyword = keyword.substring(1);
     list = protocols.getPluginNameList();
   }
   if (!keyword) {
     return list.map((name) => {
-      return isPipe ? `pipe://${name}` : `${name}=`;
+      return specProto ? `pipe://${name}` : `${name}=`;
     });
   }
   const result = [];
   keyword = keyword.toLowerCase();
+  if (specProto) {
+    keyword = `${specProto}://${keyword}`;
+  }
   list.forEach((name) => {
-    if (isPipe) {
-      name = `pipe://${name}`;
+    if (specProto) {
+      name = `${specProto}://${name}`;
     } else {
       name += '=';
     }
@@ -233,7 +237,7 @@ CodeMirror.registerHelper('hint', 'rulesHint', (editor) => {
   let pluginName;
   let value;
   let pluginVars;
-  const isPipe = PIPE_RE.test(curWord);
+  const specProto = PLUGIN_SPEC_RE.test(curWord);
   let isPluginVar = P_RE.test(curWord);
   if (isPluginVar) {
     const eqIdx = curWord.indexOf('=');
@@ -248,9 +252,9 @@ CodeMirror.registerHelper('hint', 'rulesHint', (editor) => {
       isPluginVar = false;
     }
   }
-  if (isAt || isPipe || isPluginVar) {
-    if (!byEnter || /^pipe:\/\/$/.test(curWord)) {
-      list = isAt ? getAtValueList(curWord) : getPluginVarHints(curWord, isPipe);
+  if (isAt || specProto || isPluginVar) {
+    if (!byEnter || /^(?:pipe|sniCallback):\/\/$/.test(curWord)) {
+      list = isAt ? getAtValueList(curWord) : getPluginVarHints(curWord, specProto);
     }
     if (!list || !list.length) {
       return;
@@ -260,7 +264,7 @@ CodeMirror.registerHelper('hint', 'rulesHint', (editor) => {
     } else if (isPluginVar) {
       showVarHint = true;
     }
-    return { list, from: CodeMirror.Pos(cur.line, isPipe ? start : start + 1), to: CodeMirror.Pos(cur.line, end) };
+    return { list, from: CodeMirror.Pos(cur.line, specProto ? start : start + 1), to: CodeMirror.Pos(cur.line, end) };
   }
   if (curWord) {
     if (plugin || PLUGIN_NAME_RE.test(curWord)) {

@@ -99,7 +99,8 @@ CodeMirror.defineMode('rules', () => {
   }
 
   function isPlugin(str) {
-    return /^pipe:\/\//.test(str) || (/^(?:plugin|whistle)\.[a-z\d_-]+:\/\//.test(str) && !notExistPlugin(str));
+    return /^(?:pipe|sniCallback):\/\//.test(str)
+      || (/^(?:plugin|whistle)\.[a-z\d_-]+:\/\//.test(str) && !notExistPlugin(str));
   }
 
   function isRulesFile(str) {
@@ -275,7 +276,7 @@ CodeMirror.defineMode('rules', () => {
       } else if (isHttpUrl && isWildcard(str)) {
         return 'attribute js-attribute';
       }
-      return not ? `error-rule` : (type || 'js-http-url');
+      return not ? 'error-rule' : (type || 'js-http-url');
     },
   };
 });

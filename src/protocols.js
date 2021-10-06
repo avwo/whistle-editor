@@ -9,7 +9,7 @@ const PROTOCOLS = ['rule', 'style', 'pipe', 'plugin', 'host', 'xhost', 'proxy', 
   'reqBody', 'resBody', 'reqAppend', 'resAppend', 'headerReplace', 'reqReplace', 'resReplace',
   'htmlPrepend', 'htmlBody', 'htmlAppend', 'cssPrepend', 'cssBody',
   'cssAppend', 'jsPrepend', 'jsBody', 'jsAppend', 'reqWrite', 'resWrite',
-  'reqWriteRaw', 'resWriteRaw', 'cipher',
+  'reqWriteRaw', 'resWriteRaw', 'cipher', 'sniCallback',
 ];
 
 
