@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 
 export interface EditorChangeEvent {
   getValue: () => string;
@@ -36,29 +36,29 @@ export interface WhistleEditorProps {
   value?: string;
   onChange?: (e: EditorChangeEvent) => void;
   theme?:
-    | "default"
-    | "neat"
-    | "elegant"
-    | "erlang-dark"
-    | "night"
-    | "monokai"
-    | "cobalt"
-    | "eclipse"
-    | "rubyblue"
-    | "lesser-dark"
-    | "xq-dark"
-    | "xq-light"
-    | "ambiance"
-    | "blackboard"
-    | "vibrant-ink"
-    | "solarized dark"
-    | "solarized light"
-    | "twilight"
-    | "midnight";
+  | "default"
+  | "neat"
+  | "elegant"
+  | "erlang-dark"
+  | "night"
+  | "monokai"
+  | "cobalt"
+  | "eclipse"
+  | "rubyblue"
+  | "lesser-dark"
+  | "xq-dark"
+  | "xq-light"
+  | "ambiance"
+  | "blackboard"
+  | "vibrant-ink"
+  | "solarized dark"
+  | "solarized light"
+  | "twilight"
+  | "midnight";
   fontSize?: string;
   lineNumbers?: boolean;
 }
 
-type WhistleEditor = React.ComponentClass<WhistleEditorProps>;
+declare class WhistleEditor extends React.Component<WhistleEditorProps> { }
 
 export default WhistleEditor;
