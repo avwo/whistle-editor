@@ -53,7 +53,7 @@ CodeMirror.defineMode('rules', () => {
   }
 
   function isRes(str) {
-    return /^(?:resScript|resRules|responseFor|resCookies|resHeaders|trailers|replaceStatus|redirect|resDelay|resSpeed|resCors|resType|resCharset|cache|attachment|download|resBody|resPrepend|resAppend|css(?:Append|Prepend|Body)?|html(?:Append|Prepend|Body)?|js(?:Append|Prepend|Body)?|resReplace|resMerge|resWrite|resWriteRaw):\/\//.test(str); // eslint-disable-line
+    return /^(?:resScript|resRules|responseFor|resCookies|resHeaders|trailers|replaceStatus|resDelay|resSpeed|resCors|resType|resCharset|cache|attachment|download|resBody|resPrepend|resAppend|css(?:Append|Prepend|Body)?|html(?:Append|Prepend|Body)?|js(?:Append|Prepend|Body)?|resReplace|resMerge|resWrite|resWriteRaw):\/\//.test(str); // eslint-disable-line
   }
 
   function isUrl(str) {

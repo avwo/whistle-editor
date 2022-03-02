@@ -2,7 +2,7 @@ const PROTOCOLS = ['rule', 'style', 'pipe', 'plugin', 'host', 'xhost', 'proxy', 
   'xhttp-proxy', 'https-proxy', 'xhttps-proxy', 'socks', 'xsocks',
   'pac', 'weinre', 'log', 'filter', 'ignore', 'enable', 'disable', 'delete',
   'urlParams', 'pathReplace', 'method', 'replaceStatus', 'referer', 'auth', 'ua', 'cache',
-  'redirect', 'attachment', 'forwardedFor', 'responseFor', 'reqMerge', 'resMerge',
+  'attachment', 'forwardedFor', 'responseFor', 'reqMerge', 'resMerge',
   'reqScript', 'resScript', 'reqDelay', 'resDelay', 'reqSpeed', 'resSpeed',
   'reqHeaders', 'resHeaders', 'trailers', 'reqType', 'resType', 'reqCharset',
   'resCharset', 'reqCookies', 'resCookies', 'reqCors', 'resCors', 'reqPrepend', 'resPrepend',
@@ -13,7 +13,7 @@ const PROTOCOLS = ['rule', 'style', 'pipe', 'plugin', 'host', 'xhost', 'proxy', 
 ];
 
 
-const innerRules = ['file', 'xfile', 'tpl', 'xtpl', 'rawfile', 'xrawfile', 'statusCode'];
+const innerRules = ['file', 'xfile', 'tpl', 'xtpl', 'rawfile', 'xrawfile', 'redirect', 'statusCode'];
 let plugins = {};
 let pluginRules = [];
 let pluginNameList = [];
