@@ -45,6 +45,7 @@ ReactDOM.render(editor, document.getElementById('root'));
 3. `plugins`: 添加插件名称及帮助文档链接，用于编辑器书写规则时自动提醒
     ``` js
     const plugins = {
+      'whistle.coding': 1, // 没有对应帮助链接
       test: 'http://xxxx',
       test2: {
         homepage: 'http://xxxx',
