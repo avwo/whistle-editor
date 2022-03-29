@@ -7,7 +7,7 @@ const IPV4_PORT_RE = /^(?:::(?:ffff:)?)?(?:(?:25[0-5]|2[0-4]\d|1\d{2}|[1-9]?\d)\
 const FULL_IPV6_RE = /^[\da-f]{1,4}(?::[\da-f]{1,4}){7}$/;
 const SHORT_IPV6_RE = /^[\da-f]{1,4}(?::[\da-f]{1,4}){0,6}$/;
 const IP_WITH_PORT_RE = /^\[([:\da-f.]+)\](?::(\d+))?$/i;
-const PLUGIN_VAR_RE = /^%([a-z\d_-]+)=/;
+const PLUGIN_VAR_RE = /^%([a-z\d_-]+)[=.]/;
 
 function notPort(port) {
   return port && (port == 0 || port > 65535); // eslint-disable-line
