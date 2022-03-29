@@ -12,7 +12,10 @@ const plugins = {
           return;
         }
         setTimeout(() => {
-          callback([10000, 2, 3, 4, 5, 6, 7, 8, 9, 0].map(String));
+          callback([10000, 2, 3, 4, 5, 6, 7, 8, 9, 0].map(String).concat({
+            value: '0000=ssssss',
+            isKey: true,
+          }));
         }, 1000);
       },
     },
