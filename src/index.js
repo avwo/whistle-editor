@@ -254,28 +254,16 @@ class Editor extends React.Component {
 
   setAutoComplete() {
     const isRules = this.isRulesEditor();
-    const option = isRules ? rulesHint.getExtraKeys() : {};
+    const option = isRules && !this.props.readOnly ? rulesHint.getExtraKeys() : {};
     if (!/\(Macintosh;/i.test(window.navigator.userAgent)) {
       option['Ctrl-F'] = 'findPersistent';
     }
     option['Cmd-F'] = 'findPersistent';
     const editor = this._editor;
     editor.setOption('extraKeys', option);
-    let timer;
+    editor.off('keyup', this.handleKeyUp);
     if (isRules) {
-      editor.on('keyup', (_, e) => {
-        clearTimeout(timer);
-        const _byDelete = e.keyCode === 8;
-        if (_byDelete || e.keyCode === 13) {
-          timer = setTimeout(() => {
-            if (!document.querySelector('.CodeMirror-hints')) {
-              editor._byDelete = true;
-              editor._byEnter = !_byDelete;
-              editor.execCommand('autocomplete');
-            }
-          }, 300);
-        }
-      });
+      editor.on('keyup', this.handleKeyUp);
     }
   }
 
@@ -284,6 +272,21 @@ class Editor extends React.Component {
     this._readOnly = readOnly;
     if (this._editor) {
       this._editor.setOption('readOnly', readOnly);
+    }
+  }
+
+  handleKeyUp = (_, e) => {
+    clearTimeout(this._timer);
+    const _byDelete = e.keyCode === 8;
+    if (_byDelete || e.keyCode === 13) {
+      const editor = this._editor;
+      this._timer = setTimeout(() => {
+        if (!document.querySelector('.CodeMirror-hints')) {
+          editor._byDelete = true;
+          editor._byEnter = !_byDelete;
+          editor.execCommand('autocomplete');
+        }
+      }, 300);
     }
   }
 

@@ -1,3 +1,6 @@
 {
-  "extends": "eslint-config-imweb"
+  "extends": "eslint-config-imweb",
+  "rules": {
+    "import/extensions": 0
+  }
 }
