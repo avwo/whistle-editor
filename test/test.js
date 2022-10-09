@@ -7,6 +7,7 @@ const plugins = {
     homepage: 'http://123.com',
     hintList: [1, 2, 3, 4, 5, 6, 7, 8, 9, 0].map(String),
     pluginVars: {
+      hintSuffix: ['.', '=', '.abc=', '.abcd', '=sf'],
       hintList: (options, callback) => {
         if (options.value !== '3') {
           return;

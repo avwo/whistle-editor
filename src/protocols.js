@@ -17,6 +17,7 @@ const innerRules = ['file', 'xfile', 'tpl', 'xtpl', 'rawfile', 'xrawfile', 'redi
 let plugins = {};
 let pluginRules = [];
 let pluginNameList = [];
+let pluginVarList = [];
 let allPluginNameList = [];
 let forwardRules = innerRules.slice();
 const webProtocols = ['http', 'https', 'ws', 'wss', 'tunnel'];
@@ -41,6 +42,7 @@ exports.setPlugins = (allPlugins) => {
   allPlugins = allPlugins || {};
   pluginRules = [];
   pluginNameList = [];
+  pluginVarList = [];
   allPluginNameList = [];
   forwardRules = innerRules.slice();
   allRules = allInnerRules.slice();
@@ -75,6 +77,14 @@ exports.setPlugins = (allPlugins) => {
       if (typeof hintList === 'function' || Array.isArray(hintList)) {
         plugins[name].pluginVars.hintList = hintList;
       }
+      const { hintSuffix } = pluginVars;
+      if (hintSuffix) {
+        hintSuffix.forEach((suffix) => {
+          pluginVarList.push(`%${name}${suffix}`);
+        });
+      } else {
+        pluginVarList.push(`%${name}=`);
+      }
     }
     if (prefix) {
       pluginRules.push(key);
@@ -96,6 +106,10 @@ exports.getPluginRules = function () {
 
 exports.getPluginNameList = function() {
   return pluginNameList;
+};
+
+exports.getPluginVarList = function() {
+  return pluginVarList;
 };
 
 exports.getAllPluginNameList = function() {

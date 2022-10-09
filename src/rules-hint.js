@@ -112,33 +112,24 @@ function getAtValueList(keyword) {
 function getPluginVarHints(keyword, specProto) {
   let list;
   if (specProto) {
-    list = protocols.getAllPluginNameList();
     keyword = keyword.substring(specProto.length + 3);
+    list = protocols.getAllPluginNameList().map((name) => {
+      return `${specProto}://${name}`;
+    });
   } else {
     keyword = keyword.substring(1);
-    list = protocols.getPluginNameList();
+    list = protocols.getPluginVarList();
   }
   if (!keyword) {
-    return list.map((name) => {
-      return specProto ? `${specProto}://${name}` : `${name}=`;
-    });
+    return list;
   }
-  const result = [];
   keyword = keyword.toLowerCase();
   if (specProto) {
     keyword = `${specProto}://${keyword}`;
   }
-  list.forEach((name) => {
-    if (specProto) {
-      name = `${specProto}://${name}`;
-    } else {
-      name += '=';
-    }
-    if (name.indexOf(keyword) !== -1) {
-      result.push(name);
-    }
+  return list.filter((name) => {
+    return name.indexOf(keyword) !== -1;
   });
-  return result;
 }
 
 function getAtHelpUrl(name, options) {
