@@ -9,7 +9,7 @@ const MAX_HINT_LEN = 512;
 const MAX_VAR_LEN = 100;
 const AT_RE = /^@/;
 const P_RE = /^%/;
-const P_VAR_RE = /^%([a-z\d_-]+)[=.]/;
+const P_VAR_RE = /^%([a-z\d_-]+)([=.])/;
 const PLUGIN_SPEC_RE = /^(pipe|sniCallback):/;
 const PROTOCOL_RE = /^([^\s:]+):\/\//;
 const HINT_TIMEOUT = 120;
@@ -235,10 +235,12 @@ CodeMirror.registerHelper('hint', 'rulesHint', (editor) => {
   let pluginName;
   let value;
   let pluginVars;
+  let sep;
   const specProto = PLUGIN_SPEC_RE.test(curWord) && RegExp.$1;
   let isPluginVar = P_RE.test(curWord);
   if (isPluginVar && P_VAR_RE.test(curWord)) {
     pluginName = RegExp.$1;
+    sep = RegExp.$2;
     plugin = pluginName && protocols.getPlugin(pluginName);
     pluginVars = plugin && plugin.pluginVars;
     if (!pluginVars) {
@@ -259,7 +261,7 @@ CodeMirror.registerHelper('hint', 'rulesHint', (editor) => {
     } else if (isPluginVar) {
       showVarHint = true;
     }
-    return { list, from: CodeMirror.Pos(cur.line, specProto ? start : start + 1), to: CodeMirror.Pos(cur.line, end) };
+    return { list, from: CodeMirror.Pos(cur.line, start), to: CodeMirror.Pos(cur.line, end) };
   }
   if (curWord) {
     if (plugin || PLUGIN_NAME_RE.test(curWord)) {
@@ -369,11 +371,15 @@ CodeMirror.registerHelper('hint', 'rulesHint', (editor) => {
             });
           }
           const curOrder = ++order;
-          curHintList = [];
-          pluginConf.hintList({
+          const hintOpts = {
             protocol: protoName,
             value,
-          }, (data) => {
+          };
+          curHintList = [];
+          if (sep) {
+            hintOpts.sep = sep;
+          }
+          pluginConf.hintList(hintOpts, (data) => {
             if (curOrder === order) {
               handleRemoteHints(data, editor, protoName, value, pluginVars);
             }
