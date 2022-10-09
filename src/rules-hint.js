@@ -180,8 +180,8 @@ function handleRemoteHints(data, editor, protoName, value, isVar) {
         curHintList.push(item);
       }
     } else if (item) {
-      let label; let
-        curVal;
+      let label;
+      let curVal;
       if (typeof item.label === 'string') {
         label = item.label.trim();
       }
